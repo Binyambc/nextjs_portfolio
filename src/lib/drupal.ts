@@ -1,15 +1,15 @@
 export type JsonApiResponse<T> = {
-    data: Array<{
-        id: string;
-        type: string;
-        attributes: T & Record<string, any>;
-        relationships?: Record<string, any>;
-    }>;
-    included?: Array<{
-        id: string;
-        type: string;
-        attributes: Record<string, any>;
-    }>;
+	data: Array<{
+		id: string;
+		type: string;
+		attributes: T & Record<string, any>;
+		relationships?: Record<string, { data?: unknown }>;
+	}>;
+	included?: Array<{
+		id: string;
+		type: string;
+		attributes: Record<string, unknown>;
+	}>;
 };
 
 function getBaseUrl(): string {
@@ -71,11 +71,78 @@ function extractHtmlFromAttributes(attrs: Record<string, any>): string | undefin
 	return undefined;
 }
 
+function indexIncluded(included?: Array<{ id: string; type: string; attributes: Record<string, unknown> }>): Record<string, { attributes: Record<string, unknown> }> {
+	const index: Record<string, { attributes: Record<string, unknown> }> = {};
+	if (included) {
+		for (const item of included) {
+			index[`${item.type}:${item.id}`] = { attributes: item.attributes };
+		}
+	}
+	return index;
+}
+
+function resolveSingleRelationship(node: DrupalNode, fieldName: string): { type: string; id: string; meta?: Record<string, unknown> } | null {
+	const rel = node?.relationships?.[fieldName]?.data;
+	if (!rel) return null;
+	if (Array.isArray(rel)) return (rel[0] as { type: string; id: string; meta?: Record<string, unknown> }) || null;
+	return rel as { type: string; id: string; meta?: Record<string, unknown> };
+}
+
+function resolveImageFromNode(node: DrupalNode, includedIndex: Record<string, { attributes: Record<string, unknown> }>): { url: string; alt?: string } | undefined {
+	const fileRef = resolveSingleRelationship(node, "field_image");
+	if (!fileRef) return undefined;
+	const included = includedIndex[`${fileRef.type}:${fileRef.id}`];
+	const url = (included?.attributes as { uri?: { url?: string } })?.uri?.url;
+	const alt: string | undefined = (fileRef as { meta?: { alt?: string } })?.meta?.alt;
+	if (typeof url === "string") {
+		const absoluteUrl = url.startsWith("http") ? url : `${getBaseUrl()}${url}`;
+		return { url: absoluteUrl, alt };
+	}
+	return undefined;
+}
+
+function resolveAllImagesFromNode(node: DrupalNode, includedIndex: Record<string, { attributes: Record<string, unknown> }>): { url: string; alt?: string }[] {
+	const rel = node?.relationships?.field_image?.data;
+	if (!rel) return [];
+	
+	const items = Array.isArray(rel) ? rel : [rel];
+	const images: { url: string; alt?: string }[] = [];
+	
+	for (const item of items) {
+		const included = includedIndex[`${item.type}:${item.id}`];
+		const url = (included?.attributes as { uri?: { url?: string } })?.uri?.url;
+		const alt: string | undefined = (item as { meta?: { alt?: string } })?.meta?.alt;
+		if (typeof url === "string") {
+			const absoluteUrl = url.startsWith("http") ? url : `${getBaseUrl()}${url}`;
+			images.push({ url: absoluteUrl, alt });
+		}
+	}
+	
+	return images;
+}
+
+function resolveCategoriesFromNode(node: DrupalNode, includedIndex: Record<string, { attributes: Record<string, unknown> }>): string[] {
+	const catRel = node?.relationships?.field_category?.data;
+	if (!catRel) return [];
+	
+	const items = Array.isArray(catRel) ? catRel : [catRel];
+	const categories: string[] = [];
+	
+	for (const item of items) {
+		const included = includedIndex[`${item.type}:${item.id}`];
+		const name = (included?.attributes as { name?: string })?.name;
+		if (typeof name === "string") {
+			categories.push(name);
+		}
+	}
+	
+	return categories;
+}
+
 export type PageAttributes = {
 	title: string;
 	body?: { value?: string; processed?: string };
 	field_slug?: string;
-    field_image?: any;
 } & Record<string, any>;
 
 export type ProjectAttributes = {
@@ -83,59 +150,14 @@ export type ProjectAttributes = {
 	body?: { value?: string; processed?: string };
 	field_slug?: string;
 	field_category?: string;
-    field_image?: any;
 } & Record<string, any>;
 
-type IncludedIndex = Record<string, { id: string; type: string; attributes: Record<string, any> }>;
-
-function indexIncluded(included?: JsonApiResponse<any>["included"]): IncludedIndex {
-    const index: IncludedIndex = {};
-    if (!included) return index;
-    for (const item of included) {
-        index[`${item.type}:${item.id}`] = item as any;
-    }
-    return index;
-}
-
-function resolveSingleRelationship(node: any, fieldName: string): { type: string; id: string; meta?: Record<string, any> } | null {
-    const rel = node?.relationships?.[fieldName]?.data;
-    if (!rel) return null;
-    if (Array.isArray(rel)) return rel[0] || null;
-    return rel;
-}
-
-function resolveImageFromNode(node: any, includedIndex: IncludedIndex): { url: string; alt?: string } | undefined {
-    const fileRef = resolveSingleRelationship(node, "field_image");
-    if (!fileRef) return undefined;
-    const included = includedIndex[`${fileRef.type}:${fileRef.id}`];
-    const url = included?.attributes?.uri?.url;
-    const alt: string | undefined = (fileRef as any)?.meta?.alt;
-    if (typeof url === "string") {
-        const absoluteUrl = url.startsWith("http") ? url : `${getBaseUrl()}${url}`;
-        return { url: absoluteUrl, alt };
-    }
-    return undefined;
-}
-
-function resolveAllImagesFromNode(node: any, includedIndex: IncludedIndex): { url: string; alt?: string }[] {
-    const rel = node?.relationships?.field_image?.data;
-    if (!rel) return [];
-    
-    const items = Array.isArray(rel) ? rel : [rel];
-    const images: { url: string; alt?: string }[] = [];
-    
-    for (const item of items) {
-        const included = includedIndex[`${item.type}:${item.id}`];
-        const url = included?.attributes?.uri?.url;
-        const alt: string | undefined = (item as any)?.meta?.alt;
-        if (typeof url === "string") {
-            const absoluteUrl = url.startsWith("http") ? url : `${getBaseUrl()}${url}`;
-            images.push({ url: absoluteUrl, alt });
-        }
-    }
-    
-    return images;
-}
+type DrupalNode = {
+	id: string;
+	type: string;
+	attributes: Record<string, unknown>;
+	relationships?: Record<string, { data?: unknown }>;
+};
 
 export async function fetchAllPages(): Promise<Array<{ id: string; slug: string; title: string }>> {
 	const json = await jsonApiFetch<JsonApiResponse<PageAttributes>>(
@@ -147,71 +169,57 @@ export async function fetchAllPages(): Promise<Array<{ id: string; slug: string;
 }
 
 export async function fetchPageBySlug(slug: string): Promise<{ title: string; html?: string; image?: { url: string; alt?: string } } | null> {
-    const json = await jsonApiFetch<JsonApiResponse<PageAttributes>>(
-        `/jsonapi/node/pages?filter[field_slug][value]=${encodeURIComponent(slug)}&include=field_image`
-    );
-    const node = json.data[0] as any;
-    if (!node) return null;
-    const includedIndex = indexIncluded(json.included);
-    const html = extractHtmlFromAttributes(node.attributes);
-    const image = resolveImageFromNode(node, includedIndex);
-    return { title: node.attributes.title, html, image };
+	const json = await jsonApiFetch<JsonApiResponse<PageAttributes>>(
+		`/jsonapi/node/pages?filter[field_slug][value]=${encodeURIComponent(slug)}&include=field_image`
+	);
+	const node = json.data[0] as DrupalNode;
+	if (!node) return null;
+	const includedIndex = indexIncluded(json.included);
+	const html = extractHtmlFromAttributes(node.attributes);
+	const image = resolveImageFromNode(node, includedIndex);
+	return { title: (node.attributes as { title: string }).title, html, image };
 }
 
 export async function fetchProjects(): Promise<Array<{ id: string; slug: string; title: string; image?: { url: string; alt?: string }; categories?: string[] }>> {
-    const json = await jsonApiFetch<JsonApiResponse<ProjectAttributes>>(
-        "/jsonapi/node/projects?include=field_image,field_category"
-    );
-    const includedIndex = indexIncluded(json.included);
-    return json.data
-        .map((node: any) => {
-            const slug = node?.attributes?.field_slug;
-            if (!slug) return null;
-            const image = resolveImageFromNode(node, includedIndex);
-            let categories: string[] | undefined;
-            const catRel = node?.relationships?.field_category?.data;
-            if (catRel) {
-                const items = Array.isArray(catRel) ? catRel : [catRel];
-                categories = items
-                    .map((r: any) => includedIndex[`${r.type}:${r.id}`]?.attributes?.name)
-                    .filter((n: any) => typeof n === "string");
-            }
-            return {
-                id: node.id,
-                slug,
-                title: node.attributes.title,
-                image,
-                categories,
-            };
-        })
-        .filter((n: any): n is NonNullable<typeof n> => !!n);
+	const json = await jsonApiFetch<JsonApiResponse<ProjectAttributes>>(
+		"/jsonapi/node/projects?include=field_image,field_category"
+	);
+	const includedIndex = indexIncluded(json.included);
+	return json.data
+		.map((node: DrupalNode) => {
+			const slug = (node?.attributes as { field_slug?: string })?.field_slug;
+			if (!slug) return null;
+			const image = resolveImageFromNode(node, includedIndex);
+			const categories = resolveCategoriesFromNode(node, includedIndex);
+			return { 
+				id: node.id, 
+				slug, 
+				title: (node.attributes as { title: string }).title,
+				image,
+				categories
+			};
+		})
+		.filter((n: any): n is NonNullable<typeof n> => !!n);
 }
 
-export async function fetchProjectBySlug(slug: string): Promise<{
-    title: string;
-    html?: string;
-    image?: { url: string; alt?: string };
-    images?: { url: string; alt?: string }[];
-    categories?: string[];
-} | null> {
-    const json = await jsonApiFetch<JsonApiResponse<ProjectAttributes>>(
-        `/jsonapi/node/projects?filter[field_slug][value]=${encodeURIComponent(slug)}&include=field_image,field_category`
-    );
-    const node = json.data[0] as any;
-    if (!node) return null;
-    const includedIndex = indexIncluded(json.included);
-    const html = extractHtmlFromAttributes(node.attributes);
-    const image = resolveImageFromNode(node, includedIndex);
-    const images = resolveAllImagesFromNode(node, includedIndex);
-    let categories: string[] | undefined;
-    const catRel = node?.relationships?.field_category?.data;
-    if (catRel) {
-        const items = Array.isArray(catRel) ? catRel : [catRel];
-        categories = items
-            .map((r: any) => includedIndex[`${r.type}:${r.id}`]?.attributes?.name)
-            .filter((n: any) => typeof n === "string");
-    }
-    return { title: node.attributes.title, html, image, images, categories };
+export async function fetchProjectBySlug(slug: string): Promise<{ title: string; html?: string; image?: { url: string; alt?: string }; images?: { url: string; alt?: string }[]; categories?: string[] } | null> {
+	const json = await jsonApiFetch<JsonApiResponse<ProjectAttributes>>(
+		`/jsonapi/node/projects?filter[field_slug][value]=${encodeURIComponent(slug)}&include=field_image,field_category`
+	);
+	const node = json.data[0] as DrupalNode;
+	if (!node) return null;
+	const includedIndex = indexIncluded(json.included);
+	const html = extractHtmlFromAttributes(node.attributes);
+	const image = resolveImageFromNode(node, includedIndex);
+	const images = resolveAllImagesFromNode(node, includedIndex);
+	const categories = resolveCategoriesFromNode(node, includedIndex);
+	return { 
+		title: (node.attributes as { title: string }).title, 
+		html, 
+		image,
+		images,
+		categories
+	};
 }
 
 export type MenuLinkAttributes = {

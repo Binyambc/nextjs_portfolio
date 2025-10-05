@@ -6,8 +6,8 @@ import ImageGallery from "@/app/_components/ImageGallery";
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
 
-export default async function ProjectPage({ params }: { params: { slug: string } }) {
-	const { slug } = params;
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+	const { slug } = await params;
 	const project = await fetchProjectBySlug(slug);
 	if (!project) {
 		return <div className="p-8">Not found</div>;

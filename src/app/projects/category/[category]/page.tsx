@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 
 type Project = Awaited<ReturnType<typeof fetchProjects>>[0];
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
-	const { category } = params;
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+	const { category } = await params;
 	const allProjects: Project[] = await fetchProjects();
 
 	// Build category list from data

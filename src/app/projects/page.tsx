@@ -1,41 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import { fetchProjects } from "@/lib/drupal";
-import { useEffect, useState } from "react";
 
-type Project = Awaited<ReturnType<typeof fetchProjects>>[0];
-
-export default function ProjectsPage() {
-	const [projects, setProjects] = useState<Project[]>([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		fetch("/api/projects")
-			.then((res) => res.json())
-			.then((data) => {
-				setProjects(data);
-				setLoading(false);
-			})
-			.catch((error) => {
-				console.error("Error fetching projects:", error);
-				setLoading(false);
-			});
-	}, []);
+export default async function ProjectsPage() {
+	const projects = await fetchProjects();
 
 	// Get unique categories from all projects
 	const allCategories = Array.from(
 		new Set(projects.flatMap((p) => p.categories || []))
 	);
 
-	if (loading) {
-		return (
-			<section>
-				<h1 className="text-xl font-semibold mb-6">Projects</h1>
-				<div className="text-center py-8">Loading...</div>
-			</section>
-		);
-	}
 
 	return (
 		<section className="container mx-auto px-4 py-8">

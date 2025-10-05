@@ -34,7 +34,7 @@ export default async function Home() {
   return (
     <section className="prose text-center">
       <h1>Welcome</h1>
-      <p>Publish a Drupal page with slug "home" to populate this screen.</p>
+      <p>Publish a Drupal page with slug &quot;home&quot; to populate this screen.</p>
     </section>
   );
 }
