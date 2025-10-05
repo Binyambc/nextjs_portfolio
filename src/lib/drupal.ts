@@ -2,7 +2,7 @@ export type JsonApiResponse<T> = {
 	data: Array<{
 		id: string;
 		type: string;
-		attributes: T & Record<string, any>;
+		attributes: T & Record<string, unknown>;
 		relationships?: Record<string, { data?: unknown }>;
 	}>;
 	included?: Array<{
@@ -50,21 +50,22 @@ async function jsonApiFetch<T>(endpoint: string, init?: RequestInit): Promise<T>
 	return (await res.json()) as T;
 }
 
-function extractHtmlFromAttributes(attrs: Record<string, any>): string | undefined {
+function extractHtmlFromAttributes(attrs: Record<string, unknown>): string | undefined {
 	// Prefer the standard body field
-	if (attrs?.body?.processed || attrs?.body?.value) {
-		return attrs.body.processed ?? attrs.body.value;
+	const body = attrs?.body as { processed?: string; value?: string } | undefined;
+	if (body?.processed || body?.value) {
+		return body.processed ?? body.value;
 	}
 	// Fall back to common custom rich text field names
 	const candidateKeys = ["field_body", "field_content", "field_text", "field_description"];
 	for (const key of candidateKeys) {
-		const val = attrs?.[key];
+		const val = attrs?.[key] as { processed?: string; value?: string } | undefined;
 		if (val?.processed || val?.value) return val.processed ?? val.value;
 	}
 	// Last resort: find the first attribute that looks like a text-with-summary field
 	for (const [k, v] of Object.entries(attrs)) {
 		if (v && typeof v === "object" && ("processed" in v || "value" in v)) {
-			const processed = (v as any).processed ?? (v as any).value;
+			const processed = (v as { processed?: string; value?: string }).processed ?? (v as { processed?: string; value?: string }).value;
 			if (typeof processed === "string") return processed;
 		}
 	}
@@ -164,8 +165,8 @@ export async function fetchAllPages(): Promise<Array<{ id: string; slug: string;
 		"/jsonapi/node/pages"
 	);
 	return json.data
-		.map((n) => ({ id: n.id, slug: (n.attributes as any).field_slug, title: n.attributes.title }))
-		.filter((n) => !!n.slug);
+		.map((n) => ({ id: n.id, slug: (n.attributes as { field_slug?: string }).field_slug, title: n.attributes.title }))
+		.filter((n): n is { id: string; slug: string; title: string } => !!n.slug);
 }
 
 export async function fetchPageBySlug(slug: string): Promise<{ title: string; html?: string; image?: { url: string; alt?: string } } | null> {
