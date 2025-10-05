@@ -1,9 +1,7 @@
-import { fetchAllPages, fetchPageBySlug } from "@/lib/drupal";
+import { fetchPageBySlug } from "@/lib/drupal";
 
-export async function generateStaticParams() {
-	const pages = await fetchAllPages();
-	return pages.map((p) => ({ slug: p.slug }));
-}
+// Removed generateStaticParams to avoid build-time Drupal connection
+// Pages will be rendered dynamically at request time
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
 	const { slug } = await params;

@@ -1,14 +1,50 @@
-import Link from "next/link";
-import { fetchProjects } from "@/lib/drupal";
+"use client";
 
-export default async function ProjectsPage() {
-	const projects = await fetchProjects();
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+interface Project {
+	id: string;
+	slug: string;
+	title: string;
+	image?: { url: string; alt?: string };
+	categories?: string[];
+}
+
+export default function ProjectsPage() {
+	const [projects, setProjects] = useState<Project[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		async function loadProjects() {
+			try {
+				const response = await fetch('/api/projects');
+				const data = await response.json();
+				setProjects(data);
+			} catch (error) {
+				console.error('Failed to load projects:', error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		loadProjects();
+	}, []);
 
 	// Get unique categories from all projects
 	const allCategories = Array.from(
 		new Set(projects.flatMap((p) => p.categories || []))
 	);
 
+	if (loading) {
+		return (
+			<section className="container mx-auto px-4 py-8">
+				<h1 className="text-3xl font-semibold mb-8 text-responsive">Projects</h1>
+				<div className="text-center py-8">
+					<div className="text-responsive">Loading...</div>
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section className="container mx-auto px-4 py-8">

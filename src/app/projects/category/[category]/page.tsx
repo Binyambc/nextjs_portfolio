@@ -1,22 +1,68 @@
+"use client";
+
 import Link from "next/link";
-import { fetchProjects } from "@/lib/drupal";
-import { notFound } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-type Project = Awaited<ReturnType<typeof fetchProjects>>[0];
+interface Project {
+	id: string;
+	slug: string;
+	title: string;
+	image?: { url: string; alt?: string };
+	categories?: string[];
+}
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
-	const { category } = await params;
-	const allProjects: Project[] = await fetchProjects();
+export default function CategoryPage() {
+	const params = useParams();
+	const category = params.category as string;
+	const [allProjects, setAllProjects] = useState<Project[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		async function loadProjects() {
+			try {
+				const response = await fetch('/api/projects');
+				const data = await response.json();
+				setAllProjects(data);
+			} catch (error) {
+				console.error('Failed to load projects:', error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		loadProjects();
+	}, []);
 
 	// Build category list from data
 	const allCategories = Array.from(new Set(allProjects.flatMap((p) => p.categories || [])));
+
+	if (loading) {
+		return (
+			<section className="container mx-auto px-4 py-8">
+				<div className="text-center py-8">
+					<div className="text-responsive">Loading...</div>
+				</div>
+			</section>
+		);
+	}
 
 	let categoryName: string;
 	if (category === "all") {
 		categoryName = "All Projects";
 	} else {
 		const matched = allCategories.find((c) => c.toLowerCase().replace(/\s+/g, "-") === category);
-		if (!matched) return notFound();
+		if (!matched) {
+			return (
+				<section className="container mx-auto px-4 py-8">
+					<div className="text-center py-8">
+						<h1 className="text-2xl font-semibold mb-4 text-responsive">Category Not Found</h1>
+						<Link href="/projects" className="text-[var(--accent)] hover:text-responsive">
+							← Back to Projects
+						</Link>
+					</div>
+				</section>
+			);
+		}
 		categoryName = matched;
 	}
 
