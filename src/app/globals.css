@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-gunmetal: #122932; /* Gunmetal */
+  --color-paynes_gray: #576066; /* Payne's gray */
+  --color-mountbatten_pink: #95818d; /* mountbatten_pink gray */
+  --color-thistle: #e3c0d3; /* thistle */
+  --color-almost-white: #fefefe; /* Almost white background */
+
+  /* Light mode (default) */
+  --background: var(--color-almost-white);
+  --foreground: #1a1a1a;
+  --muted: color-mix(in oklab, var(--foreground), white 75%);
+  --border: color-mix(in oklab, var(--foreground), white 85%);
+  --link: var(--color-gunmetal);
+  --accent: var(--color-mountbatten_pink);
+  --card-bg: #ffffff;
+  --card-border: var(--border);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark mode */
+[data-theme="dark"] {
+  --background: var(--color-gunmetal);
+  --foreground: #e5e7eb;
+  --muted: color-mix(in oklab, var(--foreground), black 70%);
+  --border: color-mix(in oklab, var(--foreground), black 65%);
+  --link: var(--color-thistle);
+  --accent: var(--color-mountbatten_pink);
+  --card-bg: #1e293b;
+  --card-border: color-mix(in oklab, var(--foreground), black 60%);
 }
 
+/* Fallback for system preference */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme]) {
+    --background: var(--color-gunmetal);
+    --foreground: #e5e7eb;
+    --muted: color-mix(in oklab, var(--foreground), black 70%);
+    --border: color-mix(in oklab, var(--foreground), black 65%);
+    --link: var(--color-thistle);
+    --accent: var(--color-mountbatten_pink);
+    --card-bg: #1e293b;
+    --card-border: color-mix(in oklab, var(--foreground), black 60%);
   }
 }
+
+/* Custom CSS variables for Tailwind */
+
+html, body { height: 100%; }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+a { color: var(--link); }
+
+.container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 64rem;
+}
+
+.prose {
+  line-height: 1.7;
+  font-size: 1.1rem;
+  color: var(--color-gunmetal);
+}
+
+.prose h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--color-gunmetal);
+  margin-bottom: 1.5rem;
+}
+
+.prose h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--color-gunmetal);
+  margin-bottom: 1rem;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--color-gunmetal);
+  margin-bottom: 0.75rem;
+}
+
+[data-theme="dark"] .prose {
+  color: var(--color-thistle);
+}
+
+[data-theme="dark"] .prose h1,
+[data-theme="dark"] .prose h2,
+[data-theme="dark"] .prose h3 {
+  color: var(--color-thistle);
+}
+
+/* Responsive text colors */
+.text-responsive {
+  color: var(--color-gunmetal);
+}
+
+[data-theme="dark"] .text-responsive {
+  color: var(--color-thistle);
+}
+
+/* Footer gradient responsive to theme */
+footer {
+  background: linear-gradient(135deg, var(--color-gunmetal), var(--color-thistle));
+}
+
+[data-theme="dark"] footer {
+  background: linear-gradient(135deg, var(--color-gunmetal), var(--color-thistle));
+}
+
+.header {
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.nav a,
+.nav-link {
+  color: var(--color-gunmetal);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav a:hover,
+.nav-link:hover {
+  color: var(--color-gunmetal);
+}
+
+[data-theme="dark"] .nav a,
+[data-theme="dark"] .nav-link {
+  color: var(--color-thistle);
+}
+
+[data-theme="dark"] .nav a:hover,
+[data-theme="dark"] .nav-link:hover {
+  color: var(--color-thistle);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* middle column for divider */
+  gap: 2rem;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.divider {
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--accent) 15%,
+    var(--accent) 85%,
+    transparent 100%
+  );
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .divider {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .split-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .divider {
+    display: none; /* hide divider on mobile */
+  }
 }
