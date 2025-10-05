@@ -1,33 +1,66 @@
-import { fetchPageBySlug } from "@/lib/drupal";
+"use client";
 
-export default async function Home() {
-  const home = await fetchPageBySlug("home").catch(() => null);
+import { useEffect, useState } from "react";
+
+interface HomePage {
+  title: string;
+  html?: string;
+  image?: { url: string; alt?: string };
+}
+
+export default function Home() {
+  const [home, setHome] = useState<HomePage | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadHomePage() {
+      try {
+        const response = await fetch('/api/pages/home');
+        if (response.ok) {
+          const data = await response.json();
+          setHome(data);
+        }
+      } catch (error) {
+        console.error('Failed to load home page:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadHomePage();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="prose text-center">
+        <div className="text-responsive">Loading...</div>
+      </section>
+    );
+  }
 
   if (home) {
     return (
       <article className="split-layout">
-  {/* Left side with profile image */}
-  <div className="split-left flex justify-center items-center">
-    {home.image?.url ? (
-      <div className="w-40 h-40 rounded-full border-5 border-[var(--border)] p-[2px]">
-        <img
-          src={home.image.url}
-          alt={home.image.alt ?? home.title}
-          className="w-full h-full rounded-full object-cover object-top"
-        />
-      </div>
-    ) : null}
-  </div>
+        {/* Left side with profile image */}
+        <div className="split-left flex justify-center items-center">
+          {home.image?.url ? (
+            <div className="w-40 h-40 rounded-full border-5 border-[var(--border)] p-[2px]">
+              <img
+                src={home.image.url}
+                alt={home.image.alt ?? home.title}
+                className="w-full h-full rounded-full object-cover object-top"
+              />
+            </div>
+          ) : null}
+        </div>
 
-  {/* Divider */}
-  <div className="divider" aria-hidden="true"></div>
+        {/* Divider */}
+        <div className="divider" aria-hidden="true"></div>
 
-  {/* Right side with text */}
-  <div className="split-right prose flex flex-col justify-center">
-    <div dangerouslySetInnerHTML={{ __html: home.html ?? "" }} />
-  </div>
-</article>
-
+        {/* Right side with text */}
+        <div className="split-right prose flex flex-col justify-center">
+          <div dangerouslySetInnerHTML={{ __html: home.html ?? "" }} />
+        </div>
+      </article>
     );
   }
 

@@ -1,14 +1,51 @@
+"use client";
+
 import Link from "next/link";
-import { fetchProjectBySlug } from "@/lib/drupal";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import ImageGallery from "@/app/_components/ImageGallery";
 
-// Allow dynamic project slugs without pre-generating paths
-export const dynamic = "force-dynamic";
-export const revalidate = 60;
+interface ProjectData {
+	title: string;
+	html?: string;
+	image?: { url: string; alt?: string };
+	images?: { url: string; alt?: string }[];
+	categories?: string[];
+}
 
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
-	const { slug } = await params;
-	const project = await fetchProjectBySlug(slug);
+export default function ProjectPage() {
+	const params = useParams();
+	const slug = params.slug as string;
+	const [project, setProject] = useState<ProjectData | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		async function loadProject() {
+			try {
+				const response = await fetch(`/api/projects/${slug}`);
+				if (response.ok) {
+					const data = await response.json();
+					setProject(data);
+				}
+			} catch (error) {
+				console.error('Failed to load project:', error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		loadProject();
+	}, [slug]);
+
+	if (loading) {
+		return (
+			<section className="container mx-auto px-4 py-8">
+				<div className="text-center py-8">
+					<div className="text-responsive">Loading...</div>
+				</div>
+			</section>
+		);
+	}
+
 	if (!project) {
 		return <div className="p-8">Not found</div>;
 	}
