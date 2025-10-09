@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import ImageGallery from "@/app/_components/ImageGallery";
 
 interface ProjectData {
@@ -15,11 +15,25 @@ interface ProjectData {
 
 export default function ProjectPage() {
 	const params = useParams();
+	const router = useRouter();
+	const searchParams = useSearchParams();
 	const slug = params.slug as string;
 	const [project, setProject] = useState<ProjectData | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [backUrl, setBackUrl] = useState("/projects");
 
 	useEffect(() => {
+		// Determine the back URL based on URL parameters
+		const from = searchParams.get('from');
+		const category = searchParams.get('category');
+		
+		if (from === 'category' && category) {
+			setBackUrl(`/projects/category/${category}`);
+		} else if (from === 'projects') {
+			setBackUrl('/projects');
+		}
+		// If no parameters, keep default "/projects"
+
 		async function loadProject() {
 			try {
 				const response = await fetch(`/api/projects/${slug}`);
@@ -33,7 +47,7 @@ export default function ProjectPage() {
 			}
 		}
 		loadProject();
-	}, [slug]);
+	}, [slug, searchParams]);
 
 	if (loading) {
 		return (
@@ -53,13 +67,13 @@ export default function ProjectPage() {
 			{/* Back Arrow */}
 			<div className="mb-6">
 				<Link 
-					href="/projects" 
+					href={backUrl} 
 					className="inline-flex items-center text-[var(--accent)] hover:text-responsive font-medium transition-colors"
 				>
 					<svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 					</svg>
-					Back to Projects
+					Back to {backUrl.includes('/category/') ? 'Category' : 'Projects'}
 				</Link>
 			</div>
 

@@ -86,7 +86,7 @@ export default function CategoryPage() {
 			) : (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{filteredProjects.map((p) => (
-						<Link key={p.id} href={`/projects/${p.slug}`} className="block border border-[var(--card-border)] hover:shadow-md transition-shadow overflow-hidden bg-[var(--card-bg)]">
+						<Link key={p.id} href={`/projects/${p.slug}?from=category&category=${encodeURIComponent(category)}`} className="block border border-[var(--card-border)] hover:shadow-md transition-shadow overflow-hidden bg-[var(--card-bg)]">
 							<div className="h-40 flex items-center justify-center overflow-hidden">
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								{p.image?.url ? (

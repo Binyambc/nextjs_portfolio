@@ -128,7 +128,7 @@ export default function ProjectsPage() {
 									</div>
 								) : null}
 								<Link 
-									href={`/projects/${projects[0].slug}`}
+									href={`/projects/${projects[0].slug}?from=projects`}
 									className="inline-flex items-center text-[var(--accent)] hover:text-responsive font-medium transition-colors"
 								>
 									View Project →
