@@ -25,7 +25,6 @@ export default function CategoryPage() {
 				const data = await response.json();
 				setAllProjects(data);
 			} catch (error) {
-				console.error('Failed to load projects:', error);
 			} finally {
 				setLoading(false);
 			}
@@ -101,7 +100,9 @@ export default function CategoryPage() {
 								{p.categories?.length ? (
 									<div className="mt-2 flex flex-wrap gap-2">
 										{p.categories.map((c) => (
-											<span key={c} className="text-xs bg-[var(--color-thistle)] text-[var(--color-gunmetal)] px-2 py-1">{c}</span>
+													<span key={c} className="text-xs bg-[var(--color-thistle)] text-[var(--color-gunmetal)] px-2 py-1">
+														{c}
+													</span>
 										))}
 									</div>
 								) : null}

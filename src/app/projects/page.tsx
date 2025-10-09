@@ -21,8 +21,7 @@ export default function ProjectsPage() {
 				const response = await fetch('/api/projects');
 				const data = await response.json();
 				setProjects(data);
-			} catch (error) {
-				console.error('Failed to load projects:', error);
+      } catch (error) {
 			} finally {
 				setLoading(false);
 			}
@@ -62,7 +61,9 @@ export default function ProjectsPage() {
 						>
 							<div className="flex items-center gap-3">
 								<div className="w-12 h-12 bg-gradient-to-br from-[var(--color-gunmetal)] to-[var(--color-paynes_gray)] flex items-center justify-center">
-									<span className="text-white text-sm font-medium">All</span>
+									<svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+										<path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+									</svg>
 								</div>
 								<div>
 							<div className="font-medium text-responsive">All Projects</div>
@@ -83,7 +84,7 @@ export default function ProjectsPage() {
 								>
 									<div className="flex items-center gap-3">
 										<div className="w-12 h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--color-thistle)] flex items-center justify-center">
-											<span className="text-white text-sm font-medium">{category.charAt(0)}</span>
+											<span className="text-white font-bold text-lg">{category.charAt(0)}</span>
 										</div>
 										<div>
 											<div className="font-medium text-responsive">{category}</div>
@@ -120,9 +121,9 @@ export default function ProjectsPage() {
 								{projects[0].categories?.length ? (
 									<div className="mb-3 flex flex-wrap gap-2">
 										{projects[0].categories.map((c) => (
-											<span key={c} className="text-xs bg-[var(--color-thistle)] text-[var(--color-gunmetal)] px-2 py-1">
-												{c}
-											</span>
+												<span key={c} className="text-xs bg-[var(--color-thistle)] text-[var(--color-gunmetal)] px-2 py-1">
+													{c}
+												</span>
 										))}
 									</div>
 								) : null}

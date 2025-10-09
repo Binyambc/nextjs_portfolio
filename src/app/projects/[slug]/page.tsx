@@ -28,7 +28,6 @@ export default function ProjectPage() {
 					setProject(data);
 				}
 			} catch (error) {
-				console.error('Failed to load project:', error);
 			} finally {
 				setLoading(false);
 			}
@@ -82,9 +81,9 @@ export default function ProjectPage() {
 						{project.categories?.length ? (
 							<div className="mb-6 flex flex-wrap gap-2">
 								{project.categories.map((c) => (
-									<span key={c} className="text-sm bg-[var(--color-thistle)] text-[var(--color-gunmetal)] px-3 py-1">
-										{c}
-									</span>
+												<span key={c} className="text-sm bg-[var(--color-thistle)] text-[var(--color-gunmetal)] px-3 py-1">
+													{c}
+												</span>
 								))}
 							</div>
 						) : null}

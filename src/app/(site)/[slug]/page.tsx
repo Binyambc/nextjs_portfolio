@@ -24,7 +24,6 @@ export default function Page() {
 					setPage(data);
 				}
 			} catch (error) {
-				console.error('Failed to load page:', error);
 			} finally {
 				setLoading(false);
 			}

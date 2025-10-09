@@ -21,7 +21,6 @@ export default function Home() {
           setHome(data);
         }
       } catch (error) {
-        console.error('Failed to load home page:', error);
       } finally {
         setLoading(false);
       }
