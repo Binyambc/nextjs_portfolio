@@ -3,7 +3,6 @@
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 
-// Static navigation items to avoid build-time data fetching
 const navigationItems = [
 	{ title: "Home", href: "/" },
 	{ title: "Projects", href: "/projects" },

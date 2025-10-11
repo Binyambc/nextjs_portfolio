@@ -52,12 +52,12 @@ export default function ContactPage() {
 				<div className="bg-[var(--card-bg)] border border-[var(--card-border)] p-8">
 					<form onSubmit={onSubmit} className="space-y-6">
 						<div>
-							<label htmlFor="name" className="block text-sm font-semibold text-[var(--color-thistle)] mb-2">
+							<label htmlFor="name" className="block text-sm font-semibold text-responsive mb-2">
 								Name
 							</label>
 							<input
 								id="name"
-								className="w-full border border-[var(--color-paynes_gray)] bg-[var(--card-bg)] text-[var(--color-thistle)] px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] transition-all"
+								className="w-full border border-[var(--color-paynes_gray)] bg-[var(--card-bg)] text-responsive px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] transition-all"
 								placeholder="Your name"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
@@ -66,12 +66,12 @@ export default function ContactPage() {
 						</div>
 						
 						<div>
-							<label htmlFor="email" className="block text-sm font-semibold text-[var(--color-thistle)] mb-2">
+							<label htmlFor="email" className="block text-sm font-semibold text-responsive mb-2">
 								Email
 							</label>
 							<input
 								id="email"
-								className="w-full border border-[var(--color-paynes_gray)] bg-[var(--card-bg)] text-[var(--color-thistle)] px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] transition-all"
+								className="w-full border border-[var(--color-paynes_gray)] bg-[var(--card-bg)] text-responsive px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] transition-all"
 								placeholder="your.email@example.com"
 								type="email"
 								value={email}
@@ -81,12 +81,12 @@ export default function ContactPage() {
 						</div>
 						
 						<div>
-							<label htmlFor="message" className="block text-sm font-semibold text-[var(--color-thistle)] mb-2">
+							<label htmlFor="message" className="block text-sm font-semibold text-responsive mb-2">
 								Message
 							</label>
 							<textarea
 								id="message"
-								className="w-full border border-[var(--color-paynes_gray)] bg-[var(--card-bg)] text-[var(--color-thistle)] px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] transition-all resize-vertical"
+								className="w-full border border-[var(--color-paynes_gray)] bg-[var(--card-bg)] text-responsive px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] transition-all resize-vertical"
 								placeholder="Your message..."
 								rows={6}
 								value={message}
@@ -105,9 +105,7 @@ export default function ContactPage() {
 						
 						{status && (
 							<div className={`text-sm p-3 rounded border ${
-								status.includes('Error') 
-									? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800' 
-									: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800'
+								status.includes('Error') ? 'error-message' : 'success-message'
 							}`}>
 								{status}
 							</div>

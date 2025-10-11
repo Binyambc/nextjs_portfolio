@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import SafeHTML from "@/app/_components/SafeHTML";
 
 interface HomePage {
   title: string;
@@ -43,9 +45,11 @@ export default function Home() {
         <div className="split-left flex justify-center items-center">
           {home.image?.url ? (
             <div className="w-40 h-40 rounded-full border-5 border-[var(--border)] p-[2px]">
-              <img
+              <Image
                 src={home.image.url}
                 alt={home.image.alt ?? home.title}
+                width={160}
+                height={160}
                 className="w-full h-full rounded-full object-cover object-top"
               />
             </div>
@@ -57,7 +61,7 @@ export default function Home() {
 
         {/* Right side with text */}
         <div className="split-right prose flex flex-col justify-center">
-          <div dangerouslySetInnerHTML={{ __html: home.html ?? "" }} />
+          <SafeHTML html={home.html ?? ""} />
         </div>
       </article>
     );

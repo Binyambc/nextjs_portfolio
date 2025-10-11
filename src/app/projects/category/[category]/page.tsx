@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -88,9 +89,8 @@ export default function CategoryPage() {
 					{filteredProjects.map((p) => (
 						<Link key={p.id} href={`/projects/${p.slug}?from=category&category=${encodeURIComponent(category)}`} className="block border border-[var(--card-border)] hover:shadow-md transition-shadow overflow-hidden bg-[var(--card-bg)]">
 							<div className="h-40 flex items-center justify-center overflow-hidden">
-								{/* eslint-disable-next-line @next/next/no-img-element */}
 								{p.image?.url ? (
-									<img src={p.image.url} alt={p.image.alt ?? p.title} className="h-full w-full object-cover" />
+									<Image src={p.image.url} alt={p.image.alt ?? p.title} width={300} height={160} className="h-full w-full object-cover" />
 								) : (
 									<span className="text-sm text-responsive">No image</span>
 								)}

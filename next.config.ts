@@ -8,7 +8,32 @@ const nextConfig: NextConfig = {
   // Configure Turbopack for better Vercel compatibility (updated syntax)
   turbopack: {
     // Let Vercel handle the root directory detection
-  }
+  },
+  
+  // Configure external images for Drupal CMS
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'drupalportfolio.lndo.site',
+        port: '',
+        pathname: '/sites/default/files/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'drupalportfolio.lndo.site',
+        port: '',
+        pathname: '/sites/default/files/**',
+      },
+      // Add other Drupal hostnames if needed
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/sites/default/files/**',
+      }
+    ],
+  },
 };
 
 export default nextConfig;

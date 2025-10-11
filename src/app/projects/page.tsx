@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Grid3X3 } from "lucide-react";
 
 interface Project {
 	id: string;
@@ -61,9 +63,7 @@ export default function ProjectsPage() {
 						>
 							<div className="flex items-center gap-3">
 								<div className="w-12 h-12 bg-gradient-to-br from-[var(--color-gunmetal)] to-[var(--color-paynes_gray)] flex items-center justify-center">
-									<svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-										<path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-									</svg>
+									<Grid3X3 className="w-6 h-6 text-white" />
 								</div>
 								<div>
 							<div className="font-medium text-responsive">All Projects</div>
@@ -104,10 +104,11 @@ export default function ProjectsPage() {
 						<div className="bg-[var(--card-bg)] border border-[var(--card-border)] overflow-hidden shadow-sm">
 							{projects[0].image?.url ? (
 								<div className="h-48 overflow-hidden">
-									{/* eslint-disable-next-line @next/next/no-img-element */}
-									<img 
+									<Image 
 										src={projects[0].image.url} 
 										alt={projects[0].image.alt ?? projects[0].title} 
+										width={400}
+										height={192}
 										className="w-full h-full object-cover" 
 									/>
 								</div>

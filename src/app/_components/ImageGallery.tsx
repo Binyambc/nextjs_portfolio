@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ImageGalleryProps {
   images: { url: string; alt?: string }[];
@@ -21,11 +23,12 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
   if (images.length === 1) {
     return (
       <div className="h-80 lg:h-96 flex items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img 
+        <Image 
           src={images[0].url} 
           alt={images[0].alt ?? title} 
-          className="max-w-full max-h-full object-contain"
+          width={800}
+          height={600}
+          className="max-w-full max-h-full object-contain" 
         />
       </div>
     );
@@ -55,10 +58,11 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
       {/* Main Image Container */}
       <div className="h-80 lg:h-96 relative">
         <div className="h-full flex items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
+          <Image 
             src={images[currentIndex].url} 
             alt={images[currentIndex].alt ?? title} 
+            width={800}
+            height={600}
             className="max-w-full max-h-full object-contain"
           />
         </div>
@@ -71,9 +75,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
 									className="absolute left-2 top-1/2 transform -translate-y-1/2 text-responsive hover:text-[var(--accent)] p-2 transition-colors"
               aria-label="Previous image"
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-8 h-8" />
             </button>
             
             <button
@@ -81,9 +83,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
 									className="absolute right-2 top-1/2 transform -translate-y-1/2 text-responsive hover:text-[var(--accent)] p-2 transition-colors"
               aria-label="Next image"
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="w-8 h-8" />
             </button>
           </>
         )}
@@ -92,25 +92,29 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
       {/* Thumbnails - Below image */}
       {images.length > 1 && (
         <div className="flex justify-center gap-2 mt-4 pb-2">
-          {images.map((image, index) => (
+          {images.map((image, index) => {
+            const isActive = index === currentIndex;
+            const buttonClass = isActive 
+              ? "w-12 h-12 border-2 border-[var(--accent)] transition-all"
+              : "w-12 h-12 border-2 border-[var(--border)] hover:border-[var(--accent)] transition-all";
+            
+            return (
             <button
               key={index}
               onClick={() => goToImage(index)}
-              className={`w-12 h-12 border-2 transition-all ${
-                index === currentIndex 
-                  ? "border-[var(--accent)]" 
-                  : "border-[var(--border)] hover:border-[var(--accent)]"
-              }`}
+              className={buttonClass}
               aria-label={`Go to image ${index + 1}`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
+              <Image 
                 src={image.url} 
                 alt={image.alt ?? `${title} thumbnail ${index + 1}`}
+                width={48}
+                height={48}
                 className="w-full h-full object-cover"
               />
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

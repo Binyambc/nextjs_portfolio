@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
+import SafeHTML from "@/app/_components/SafeHTML";
 
 interface PageData {
 	title: string;
@@ -50,10 +52,11 @@ export default function Page() {
 			<div className="split-left flex justify-center items-center">
 				{page.image?.url ? (
 					<div className="w-40 h-40 rounded-full border-5 border-[var(--border)] p-[2px]">
-						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
+						<Image
 							src={page.image.url}
 							alt={page.image.alt ?? page.title}
+							width={160}
+							height={160}
 							className="w-full h-full rounded-full object-cover object-top"
 						/>
 					</div>
@@ -65,7 +68,7 @@ export default function Page() {
 
 			{/* Right side with content */}
 			<div className="split-right prose flex flex-col justify-center">
-				<div dangerouslySetInnerHTML={{ __html: page.html ?? "" }} />
+				<SafeHTML html={page.html ?? ""} />
 			</div>
 		</article>
 	);
