@@ -81,11 +81,34 @@ a { color: var(--link); }
   margin-bottom: 1rem;
 }
 
+.prose h2:not(:first-child) {
+  margin-top: 2.5rem;
+}
+
 .prose h3 {
   font-size: 1.5rem;
   font-weight: 500;
   color: var(--color-gunmetal);
   margin-bottom: 0.75rem;
+}
+
+.prose h3:not(:first-child) {
+  margin-top: 2.5rem;
+}
+
+.prose p + p {
+  margin-top: 2rem;
+}
+
+/* About page: theme-matching rectangle around each paragraph */
+.prose-about p {
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  padding: 1rem 1.25rem;
+}
+
+.prose-about p + p {
+  margin-top: 1.25rem;
 }
 
 [data-theme="dark"] .prose {

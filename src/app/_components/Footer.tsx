@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -9,11 +9,20 @@ export default function Footer() {
           {/* Social Links */}
           <div>
             <h3 className="text-base font-semibold text-white mb-4">Connect</h3>
-            <div className="flex space-x-4 justify-center">
-                <a
-                  href="https://www.linkedin.com/in/binyam-angamo-0611172b9"
-                  target="_blank"
-                  rel="noopener noreferrer"
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <a
+                href="https://github.com/Binyambc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-[var(--accent)] transition-colors"
+                aria-label="GitHub Profile"
+              >
+                <Github className="w-6 h-6" />
+              </a>
+              <a
+                href="https://www.linkedin.com/public-profile/settings/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_self_edit_contact_info%3BIkH3rb3yT%2FOJ2dfwjQm7rw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-white hover:text-[var(--accent)] transition-colors"
                 aria-label="LinkedIn Profile"
               >

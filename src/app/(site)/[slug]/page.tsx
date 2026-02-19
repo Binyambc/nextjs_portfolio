@@ -46,6 +46,32 @@ export default function Page() {
 	if (!page) {
 		return <div className="p-8">Not found</div>;
 	}
+
+	const isAbout = slug === "about";
+
+	if (isAbout) {
+		return (
+			<article className="flex flex-col items-center max-w-3xl mx-auto pt-12">
+				{/* Profile picture on top, centered */}
+				{page.image?.url ? (
+					<div className="w-40 h-40 rounded-full border-[3px] border-[var(--border)] p-[2px] mb-8 shrink-0">
+						<Image
+							src={page.image.url}
+							alt={page.image.alt ?? page.title}
+							width={160}
+							height={160}
+							className="w-full h-full rounded-full object-cover object-top"
+						/>
+					</div>
+				) : null}
+				{/* Paragraphs below, aligned */}
+				<div className="prose prose-about w-full text-left">
+					<SafeHTML html={page.html ?? ""} />
+				</div>
+			</article>
+		);
+	}
+
 	return (
 		<article className="split-layout">
 			{/* Left side with image */}
